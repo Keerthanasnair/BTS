@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card strong {
+            color: #007bff;
+        }
+        .card p {
+            margin: 10px 0;
+            color: #555;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Notifications</h1>
+        
+        {% for notification in notifications %}
+        <div class="card">
+            <input type="hidden" name="notification_ids" value="{{ notification.id }}">
+            <strong>{{ notification.created_at }}</strong>
+            <p>{{ notification.message }}</p>
+        </div>
+        {% endfor %}
+
+        <div class="btn-container">
+            <a href="{% url 'admin_home' %}" class="btn">Back to Home</a>
+            <a href="{% url 'mark_as_read' %}" class="btn">Mark as read</a>
+        </div>
+    </div>
+</body>
+</html>

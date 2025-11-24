@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pylint Report for {{ filename }}</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <h3></h3>
+            <ul>
+                <li><a href="{% url 'tester_home' %}">Home</a></li>
+                <li><a href="{% url 'tasks_page' %}">Assigned Tasks</a></li>
+                <li><a href="{% url 'tester_review_script' %}">Review Form</a></li>
+                <li><a href="{% url 'tester_total' %}">Total Assigned Tasks</a></li>
+                <li><a href="{% url 'tester_progress' %}">In Progress Tasks</a></li>
+                <li><a href="{% url 'completed_reports' %}">Completed Reports</a></li>          
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+    
+            </ul>
+        </div>
+        <div class="main-content">
+            {% if filename %}
+            <h2>Pylint Report for {{ filename }}</h2>
+            <pre>{{ report }}</pre>
+            {% else %}
+            <h2>No Report Found</h2>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>

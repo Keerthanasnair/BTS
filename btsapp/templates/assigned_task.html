@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Bug Tracking Management System{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>   
+        <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+        
+         
+    </head>
+
+    <body>
+        <div class="dashboard-container">
+            <div class="sidebar">
+                <h3></h3>
+                <ul>
+                    <li><a href="{% url 'admin_home' %}">Home</a></li>      
+                    <li><a href="{% url 'dashboard_summary' %}">Dashboard</a></li>  
+                    <li><a href="{% url 'check_tasks' %}">Assign Tasks</a></li>
+                    <li><a href="{% url 'users_list' %}">Users List</a></li>
+                    <li><a href="{% url 'task_assign' %}">Task Report</a></li>            
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+        
+                </ul>
+            </div>
+            <div class="main-content">
+                <h2>Tasks</h2>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Sl. No</th>
+                            <th>Filename</th>
+                            <th>Uploaded By</th>
+                            <th>Uploaded Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for script in scripts %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ script.filename }}</td>
+                                <td>{{ script.userid.username }}</td>
+                                <td>{{ script.datetime }}</td>
+                                <td>
+                                    <select class="tester-select" data-script-id="{{ script.id }}">
+                                        <option value="">Select Tester</option>
+                                        {% for tester in testers %}
+                                        <option value="{{ tester.id }}">{{ tester.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button class="assign-btn" data-script-id="{{ script.id }}">Assign</button>
+                                </td>
+                                
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">No users found</td>
+                            </tr>
+                                  
+                      
+                
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </body>
+    <script>
+    $(document).ready(function(){
+        
+        $(document).on('click', '.assign-btn', function() {
+        var scriptId = $(this).data('script-id');
+        var testerId = $(this).siblings('.tester-select').val();
+        
+        if (testerId) {
+            $.ajax({
+                url: "{% url 'assigned_task' %}",
+                type: 'POST',
+                data: {
+                    'script_id': scriptId,
+                    'tester_id': testerId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    alert(response.message);
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        } else {
+            alert('Please select a tester.');
+        }
+    }); 
+		
+
+    });        
+
+    </script>
+</html>
+
+
+

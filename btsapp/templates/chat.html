@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with BugTrackingBot</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        /* Basic reset and body styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Chat container styling */
+        #chat-container {
+            background-color: white;
+            width: 350px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        /* Chat header */
+        #chat-container h2 {
+            background-color: #17a2b8;
+            color: white;
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Chat box */
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        /* User and Bot message styling */
+        .message {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: #d1ecf1;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #e2e3e5;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        /* Chat input and send button */
+        #chat-form {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        #user-message {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        #chat-form button {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-left: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        #chat-form button:hover {
+            background-color: #138496;
+        }
+
+        /* Scrollbar styles */
+        #chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-box::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 400px) {
+            #chat-container {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <h2>BugTrackingBot</h2>
+        <div id="chat-box">
+            <!-- Chat messages will appear here -->
+        </div>
+        <form id="chat-form">
+            <input type="text" id="user-message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Send message to chatbot and receive a response
+            $('#chat-form').on('submit', function (event) {
+                event.preventDefault();
+                let userMessage = $('#user-message').val();
+                if (userMessage) {
+                    // Display user message in chat box
+                    $('#chat-box').append('<div class="message user-message"><strong>You:</strong> ' + userMessage + '</div>');
+                    $('#user-message').val(''); // Clear input box
+    
+                    // Scroll to bottom of the chat box
+                    $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+    
+                    // Send message to server via AJAX
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "chat" %}', // Replace with correct URL
+                        data: {
+                            'message': userMessage,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        },
+                        success: function (response) {
+                            // Display bot response in chat box
+                            $('#chat-box').append('<div class="message bot-message"><strong>Bot:</strong> ' + response.response + '</div>');
+                            $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight); // Scroll to bottom
+                        }
+                    });
+                }
+            });
+    
+            // Clear chat on page close or refresh
+            window.addEventListener('beforeunload', function () {
+                $('#chat-box').empty(); // Clear chat box content
+            });
+        });
+    </script>
+    
+</body>
+
+</html>

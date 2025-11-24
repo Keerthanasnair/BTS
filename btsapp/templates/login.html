@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ss.css' %}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Ensure the password input and icon are on the same line */
+        .password-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Style for the password input */
+        .password-wrapper input {
+            width: 100%; /* Allow input to take full width */
+            padding-right: 80px; /* Space for the eye icon */
+        }
+
+        /* Style for the toggle button (eye icon) */
+        .eye-icon {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            left: 230px; /* Position the icon to the right */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            height: 30px;
+            width: 30px;
+        }
+
+        .eye-icon i {
+            font-size: 18px; /* Adjust the icon size */
+            color: #333; /* Ensure icon has a visible color */
+        }
+    </style>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+<body>
+<br>
+<br>
+<div class="cont">
+    <div class="form sign-in">
+        <h2>Welcome</h2>
+        <form>
+        <label>
+            <span>Email</span>
+            <input type="email" name="email" id="email" required/>
+        </label>
+        <label>
+            <span>Password</span>
+            <div class="password-wrapper">
+                <input type="password" name="password" id="password" required/>
+                <button type="button" id="togglePassword" class="eye-icon">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </label>
+        <!-- <p class="forgot-pass">Forgot password?</p> -->
+        <button type="button" class="submit" id="signin">Sign In</button>
+        </form>
+    </div>
+    <div class="sub-cont">
+        <div class="img">
+            <div class="img__text m--up">
+                <h3>Don't have an account? Please Sign up!<h3>
+            </div>
+            <div class="img__text m--in">
+                <h3>If you already have an account, just sign in.<h3>
+            </div>
+            <div class="img__btn">
+                <span class="m--up">Sign Up</span>
+                <span class="m--in">Sign In</span>
+            </div>
+        </div>
+        <div class="form sign-up">
+            <h2>Create your Account</h2>
+            <label>
+                <span>Username</span>
+                <input type="text" name="username" id="username"/>
+            </label>
+            <label>
+                <span>Email</span>
+                <input type="email" name="emailid" id="emailid"/>
+            </label>
+            <label>
+                <span>Password</span>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="pswd" required/>
+                    <button type="button" id="togglePassword1" class="eye-icon">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </label>
+            <label>
+                <span>Role</span>
+                <select id="userrole">                        
+                    <option value="developer">Developer</option>
+                    <option value="tester">Tester</option>
+                </select>                    
+            </label>
+            <button type="button" class="submit" id="signup">Sign Up</button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    document.querySelector('.img__btn').addEventListener('click', function() {
+        document.querySelector('.cont').classList.toggle('s--signup');
+    });
+
+    $(document).ready(function() {
+        //-----------------------------login-------------------------------
+        $('#signin').click(function(){
+            console.log('login clicked');
+            
+            umail = $('#email').val();
+            upwd = $('#password').val();
+            $.ajax({
+                url:'/login/',
+                dataType: 'json',
+                method: 'POST',
+                data: {
+                    'email': umail,
+                    'password': upwd,
+                },
+                success: function(data) {
+                    if(data.result=="A"){
+                        alert('Login Successful !!..');
+                        window.location.href = "{% url 'admin_home' %}"
+                    } else if(data.result=='D') {
+                        alert('Login Successful !!..');
+                        window.location.href = "{% url 'developer_home' %}"
+                    } else if(data.result=='T') {
+                        alert('Login Successful !!..');
+                        window.location.href = "{% url 'tester_home' %}"
+                    }else{
+                        alert('Login Failed !!..');
+                    }
+                },
+            })
+        });
+
+        //----------------------------register----------------------------
+        $('#signup').click(function(){
+            console.log("clicked signup...");
+            uname=$('#username').val()
+            umail = $('#emailid').val()
+            upwd = $('#pswd').val()            
+            urole = $('#userrole').val()
+            
+            $.ajax({
+                url: '/register/',
+                dataType: 'json',
+                method: 'POST',
+                data:{
+                    "username": uname,
+                    "mail": umail,
+                    "password": upwd,
+                    "role": urole,
+                },
+                success: function(any){
+                    if(any.result=="yes"){
+                        alert("Successfully Registered!!!...");
+                        window.location.href = "{% url 'login_page' %}"
+                    }
+                    else{
+                        alert("Registration Failed!!..")
+                    }
+                }
+            });            
+        });
+
+        //----------------------------password toggle----------------------------
+        $('#togglePassword').click(function() {
+            var passwordField = $('#password');
+            var icon = $('#togglePassword i');
+
+            // Toggle password visibility
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        $('#togglePassword1').click(function() {
+            var passwordField = $('#pswd');
+            var icon = $('#togglePassword1 i');
+
+            // Toggle password visibility
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+    });
+</script>
+
+</html>
